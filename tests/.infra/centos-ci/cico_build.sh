@@ -11,4 +11,10 @@
 # update machine, get required deps in place
 # this script assumes its being run on CentOS Linux 7/x86_64
 
-echo -e +++++++++++++++++++++++ $(rpm -q centos-release)
+echo ++++++++++available memory:+++++++++++++ 
+free -t
+echo +++++++++++++++++++++++++++++++++++++++++ 
+echo
+echo +++++++++++++++CPU info:+++++++++++++++++ 
+lscpu
+echo +++++++++++++++++++++++++++++++++++++++++
