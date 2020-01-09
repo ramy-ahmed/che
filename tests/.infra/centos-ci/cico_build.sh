@@ -47,8 +47,17 @@ echo $LOCAL_IP_ADDRESS
 #oc login -u developer -p pass
 
 cd deploy/openshift && ./ocp.sh --run-ocp --deploy-che --multiuser
-
-#bash <(curl -sL  https://www.eclipse.org/che/chectl/) --channel=next
+echo "==== oc get events ===="
+oc get events
+echo "==== oc get all ===="
+oc get all
+echo "==== docker ps ===="
+docker ps
+echo "==== docker ps -q | xargs -L 1 docker logs ===="
+docker ps -q | xargs -L 1 docker logs | true
+oc logs $(oc get pods --selector=component=che -o jsonpath="{.items[].metadata.name}") || true
+oc logs $(oc get pods --selector=component=keycloak -o jsonpath="{.items[].metadata.name}") || true
+curl -vL http://keycloak-che.${LOCAL_IP_ADDRESS}.nip.io/auth/realms/che/.well-known/openid-configuration
 
 
 #echo "====Replace CRD===="
