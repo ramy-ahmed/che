@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# Copyright (c) 2018 Red Hat, Inc.
+#!/bin/bash
+# Copyright (c) 2017 Red Hat, Inc.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -46,26 +46,34 @@ echo $LOCAL_IP_ADDRESS
 #oc adm policy add-cluster-role-to-user cluster-admin developer
 #oc login -u developer -p pass
 
-cd deploy/openshift && ./ocp.sh --run-ocp --deploy-che --multiuser
+if cd deploy/openshift && ./ocp.sh --run-ocp --deploy-che --multiuser
+then 
+    echo "Started succesfully"
+else
+    echo "==== oc get events ===="
+    oc get events
+    echo "==== oc get all ===="
+    oc get all
+    echo "==== docker ps ===="
+    docker ps
+    echo "==== docker ps -q | xargs -L 1 docker logs ===="
+    docker ps -q | xargs -L 1 docker logs | true
+    oc logs $(oc get pods --selector=component=che -o jsonpath="{.items[].metadata.name}") || true
+    oc logs $(oc get pods --selector=component=keycloak -o jsonpath="{.items[].metadata.name}") || true
+    curl -vL http://keycloak-che.${LOCAL_IP_ADDRESS}.nip.io/auth/realms/che/.well-known/openid-configuration
+    exit 1337
+fi
 
-#bash <(curl -sL  https://www.eclipse.org/che/chectl/) --channel=next
 
+#echo "====Replace CRD===="
+#curl -o org_v1_che_crd.yaml https://raw.githubusercontent.com/eclipse/che-operator/63402ddb5b6ed31c18b397cb477906b4b5cf7c22/deploy/crds/org_v1_che_crd.yaml
+#cp org_v1_che_crd.yaml /usr/local/lib/chectl/templates/che-operator/crds/
 
-echo "==== oc get events ===="
-        oc get events
-        echo "==== oc get all ===="
-        oc get all
-        echo "==== docker ps ===="
-        docker ps
-        echo "==== docker ps -q | xargs -L 1 docker logs ===="
-        docker ps -q | xargs -L 1 docker logs | true
-        oc logs $(oc get pods --selector=component=che -o jsonpath="{.items[].metadata.name}") || true
-        oc logs $(oc get pods --selector=component=keycloak -o jsonpath="{.items[].metadata.name}") || true
-        curl -vL http://keycloak-che.${LOCAL_IP_ADDRESS}.nip.io/auth/realms/che/.well-known/openid-configuration
-echo "--------------------------------------------"
+#chectl server:start -a operator -p openshift --k8spodreadytimeout=360000 --listr-renderer=verbose
+
 CHE_ROUTE=$(oc get route che --template='{{ .spec.host }}')
 
-#docker run --shm-size=256m -e TS_SELENIUM_BASE_URL="http://$CHE_ROUTE" eclipse/che-e2e:nightly
+docker run --shm-size=256m -e TS_SELENIUM_BASE_URL="http://$CHE_ROUTE" eclipse/che-e2e:nightly
 
 #set +x
 ### DO NOT MERGE!!!
