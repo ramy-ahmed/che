@@ -46,7 +46,7 @@ echo $LOCAL_IP_ADDRESS
 #oc adm policy add-cluster-role-to-user cluster-admin developer
 #oc login -u developer -p pass
 
-if cd deploy/openshift && ./ocp.sh --run-ocp --deploy-che --multiuser
+if cd deploy/openshift && ./ocp.sh --run-ocp --deploy-che
 then 
     echo "Started succesfully"
 else
