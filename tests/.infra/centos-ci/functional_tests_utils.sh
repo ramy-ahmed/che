@@ -66,7 +66,7 @@ function installWget() {
 
 function installDependencies() {
   installEpelRelease
-  installYQ
+  #installYQ
   installStartDocker
   installJQ
   installOC
