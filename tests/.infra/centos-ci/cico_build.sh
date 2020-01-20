@@ -20,7 +20,7 @@ function archiveArtifacts1(){
 
 set -e
 
-echo "****** Starting RH-Che PR check $(date) ******"
+echo "****** Starting RH-Che PR check $(date) *******"
 
 total_start_time=$(date +%s)
 export PR_CHECK_BUILD="true"
